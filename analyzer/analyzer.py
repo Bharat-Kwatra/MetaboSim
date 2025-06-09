@@ -1,19 +1,31 @@
-"""
-Module: analyzer.analyzer
-Flux variability and bottleneck analyses.
-"""
 import pandas as pd
-import cobra
 from cobra.flux_analysis import flux_variability_analysis
 
+def analyze_flux(model, solution):
+    """
+    Performs Flux Variability Analysis (FVA) on the simulation results.
 
-def analyze_flux(solution: cobra.Solution) -> pd.DataFrame:
-    """Summarize flux values and variability."""
-    model = solution.model
-    fva = flux_variability_analysis(model)
+    Args:
+        model (cobra.Model): The model that was simulated.
+        solution (cobra.Solution): The solution object from the simulation.
+
+    Returns:
+        pandas.DataFrame: A DataFrame with reaction fluxes and variability.
+    """
+    if solution.status != 'optimal':
+        print("   - Skipping FVA as the solution is not optimal.")
+        return pd.DataFrame({'flux': solution.fluxes})
+        
+    # Use the model passed directly into the function
+    fva_result = flux_variability_analysis(
+        model, model.reactions, fraction_of_optimum=0.95
+    )
+    
+    # Combine results into a single DataFrame
     df = pd.DataFrame({
-        'flux_mean': solution.fluxes,
-        'flux_min': fva['minimum'],
-        'flux_max': fva['maximum']
+        'flux': solution.fluxes,
+        'minimum': fva_result['minimum'],
+        'maximum': fva_result['maximum']
     })
-    return df
+    
+    return df.sort_values(by='flux', ascending=False)

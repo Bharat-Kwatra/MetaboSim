@@ -1,20 +1,33 @@
-"""
-Module: simulator.simulator
-Flux balance analysis and perturbations.
-"""
 import cobra
-from cobra.flux_analysis import pfba
+# The new, recommended function is imported directly
+from cobra.manipulation import knock_out_model_genes
 
-def run_flux_balance(model: cobra.Model, knockout: str = None, drug_targets: dict = None) -> cobra.Solution:
-    """Perform FBA or knock-out and drug perturbation simulations."""
+def run_flux_balance(model, knockout=None, drug_targets=None):
+    """Runs flux balance analysis on the model."""
     sim_model = model.copy()
+
     if knockout:
-        if knockout in sim_model.genes:
-            sim_model.genes.get_by_id(knockout).knock_out()
+        try:
+            # FIX: Use the modern knock_out_model_genes function.
+            # This function works "in place" but we use a model copy
+            # to avoid modifying the original model.
+            knock_out_model_genes(sim_model, [knockout])
+            print(f"   - Successfully knocked out gene '{knockout}'.")
+        except KeyError:
+            print(f"   - Warning: Knockout gene '{knockout}' not found in model.")
+
     if drug_targets:
-        for gene, coeff in drug_targets.items():
-            for rxn in sim_model.reactions:
-                if gene in rxn.genes:
-                    rxn.upper_bound *= coeff
-    solution = pfba(sim_model)
+        print("   - Applying drug targets...")
+        for target, value in drug_targets.items():
+            try:
+                # A value of 0 means blocking the reaction
+                sim_model.reactions.get_by_id(target).lower_bound = value
+                sim_model.reactions.get_by_id(target).upper_bound = value
+                print(f"     - Blocked reaction '{target}'.")
+            except KeyError:
+                print(f"   - Warning: Drug target '{target}' not found in model.")
+
+    # Use the standard, most robust FBA method.
+    solution = sim_model.optimize()
+
     return solution
