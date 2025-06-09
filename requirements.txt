@@ -1,4 +1,4 @@
-cobrapy
+cobra
 networkx
 pandas
 streamlit

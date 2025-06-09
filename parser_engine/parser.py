@@ -1,3 +1,4 @@
+"""
 Module: parser_engine.parser
 Parse COBRA model into internal reaction graph.
 """
