@@ -1,0 +1,5 @@
+cobrapy
+networkx
+pandas
+streamlit
+plotly
