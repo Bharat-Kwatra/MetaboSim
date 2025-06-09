@@ -1,0 +1,29 @@
+metabosim/
+├── input_loader/
+│   ├── __init__.py
+│   └── loader.py
+├── parser_engine/
+│   ├── __init__.py
+│   └── parser.py
+├── core_model/
+│   ├── __init__.py
+│   └── model.py
+├── simulator/
+│   ├── __init__.py
+│   └── simulator.py
+├── analyzer/
+│   ├── __init__.py
+│   └── analyzer.py
+├── contextualizer/
+│   ├── __init__.py
+│   └── contextualizer.py
+├── output/
+│   ├── __init__.py
+│   └── exporter.py
+├── visualizer/
+│   ├── __init__.py
+│   └── visualizer.py
+├── run_simulation.py
+├── app.py
+├── requirements.txt
+└── README.md
